@@ -1,0 +1,21 @@
+CACHE MANIFEST
+# {{{WARNING}}}
+# manifest version {{{VERSION}}}
+# Files to cache
+
+CACHE:
+
+{{{PAGE}}}
+desktop.html
+
+{{{STYLES}}}
+sencha/sencha-touch.js
+extern/jquery.easing.1.3.js
+extern/jquery.min.js
+
+{{{SOURCES}}}
+{{{CREATIVES}}}
+NETWORK:
+*
+http://*
+https://*

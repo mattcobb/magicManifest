@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!-- {{{WARNING}}} -->
+<html>
+   <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+    <!--<link href="login.css" rel="stylesheet" type="text/css"/>-->
+
+    <!-- app_eula.css and login.css is called from magicManifestsConfig.js and is the main stylesheet-->
+
+       {{{STYLES}}}
+
+  <script type="text/javascript">
+
+    function makePageVisible(pageName) {
+       var pageArr = ["summaryEula", "loginPage", "decline", "eula", "privacyPolicy", "otherLogin", "PhoneOnly"];
+
+       for (var i=0; i < pageArr.length; i++) {
+
+        if (pageArr[i] == pageName) {
+            document.getElementById(pageArr[i]).className = "";
+            } else {
+                document.getElementById(pageArr[i]).className = "hide";
+            }
+        }
+    }
+
+    function acceptTou() {
+        if (localStorage && !isBetaRequested()) {
+            localStorage.setItem("tou", "yes");
+        }
+        makePageVisible("loginPage");
+    }
+
+
+    function showContent() {
+        //show all the text content at the same time only after the document has loaded
+
+        // for now always make it go to ula
+
+      //non Android users can't log in here or download the beta bits
+      if (isBetaRequested()){
+          if (!isAndroid()){
+          makePageVisible('PhoneOnly');
+          return;
+      }
+            }
+
+        if (localStorage && localStorage.getItem("tou") == 'yes'){
+            makePageVisible("loginPage");
+
+        }else{
+           makePageVisible("summaryEula");
+        }
+
+       // makePageVisible("summaryEula");
+    }
+
+  function isBetaRequested() {
+      var beta = false;
+      if ((typeof(window) != 'undefined') &&
+      (typeof(window.location) != 'undefined') &&
+      (typeof(window.location.search) != 'undefined') &&
+      (window.location.search.indexOf('?beta=true') != -1)) {
+      beta = true;
+      }
+  return beta;
+  }
+
+  function isAndroid(){
+      if ( navigator.userAgent.toLowerCase().indexOf('android') == -1){
+      return false;
+      } else {
+      return true;
+      }
+  }
+
+  function exitXwishWebview() {
+     // no popup support on this page from sencha so just exit
+     // if user hit back button
+        if (window.ob) window.ob.finish(); // call JAVA exit webview
+    }
+    </script>
+
+      {{{SOURCES}}}
+
+  <script type="text/javascript">
+    function fbLogin(){
+       login({});
+    }
+    
+    function twLogin(){
+       login({authPath:cloudAddress.twAuthPath});
+    }
+    
+    function login(ctx) {
+        var CA = new cloudAddress.cloudAddress();
+        var targetUrl = CA.buildAuthUrl({authPath: ctx.authPath,  landPage: cloudAddress.cloudConfiguration.intermediateLoginMobile});
+        var beta = false;
+
+        // here checking if we sould use the beta landing page
+          if (isBetaRequested()){
+              if (isAndroid())  {
+                targetUrl = CA.buildAuthUrl({landPage:cloudAddress.cloudConfiguration.instructions});
+          beta = true;
+          } else{
+              makePageVisible('PhoneOnly');
+              }
+          }
+
+        if(phoneInterop.isPhone() || beta) {
+           window.location = targetUrl;
+        }else{
+            //alert(targetUrl);
+            var popFeatures = "width=600, height=400, toolbar=0, location=0, directories=0, status=0, menuBar=0, scrollBars=0, resizable=1";
+            var loginWin = window.open(targetUrl,'loginWin', popFeatures);
+            loginWin.focus();
+        }
+
+    }
+  </script>
+
+ <script type="text/javascript">
+   //prevents bouncy scrolling in iPhone
+   //document.ontouchmove = function(event) {
+   //     event.preventDefault();
+   //}
+ </script>
+    </head>
+
+
+<body onload="showContent()">
+<div id="loginPage" class="hide">
+    <div class="toolbar" ><div id="loading" style="display:none;"> </div></div>
+ <div class="logo" ><img src='img_over_the_net/logo_bg.png' alt="logo"></div>
+    <div id="container">
+        <div class="fbloginbtn"><a href='javascript:fbLogin();'><img src="img_over_the_net/Facebook_login.png" alt="fblogin"/></a></div>
+        <div class="fbloginbtn"><a href='javascript:twLogin();'><img src="img_over_the_net/sign-in-with-twitter-gray.png" alt="fblogin"/></a></div>
+        <div class="nonfbloginbtn"><a href="javascript:makePageVisible('otherLogin');">Don't have a Facebook Account?</a></div>
+    </div>
+</div>
+
+ <div id="summaryEula" class="hide">
+    <div class="headerBox">
+      <h1>End-User License Agreement</h1>
+      <a id="auth" href="javascript:makePageVisible('summaryEula');"><img src="img_over_the_net/logo_bg.png" class="logo" /></a>
+    </div>
+    <div id="mainBox" class="mainBox">
+        <div class="content">
+           <p>By clicking "I agree" below, you agree that you have read, understood, and
+           agree to the <a href="javascript:makePageVisible('eula');">End-User License
+           Agreement</a> ("EULA") set forth below and that you consent to the collection and use of your location data. Please see the
+           <a href="javascript:makePageVisible('eula');">EULA</a> for information on
+           how to temporarily suspend or completely stop such collection. You should also
+           read our <a id="privacy"  href="javascript:makePageVisible('privacyPolicy');">Privacy
+           Policy</a> for other information about our privacy practices.</p>
+
+        <p>Your location will not be shared with third parties without your consent, except in the limited ways set forth in our <a  href="javascript:makePageVisible('privacyPolicy');">privacy policy.</a></p>
+
+        </div>
+        <div class="footer">
+        <div class="btn"><a id="auth" href="javascript:acceptTou();"><span class="leftBtn">I agree</span></a></div>
+        <div class="btn"><a id="decline" href="javascript:makePageVisible('decline');"><span class="rightBtn">I don't agree</span></a></div>
+        </div>
+    </div>
+    </div>
+
+ <div id="decline" class="hide" >
+       <div class="headerBox"><a id="auth" href="javascript:makePageVisible('summaryEula');"><img src="img_over_the_net/logo_bg.png" class="logo" /></a><h1>The XWish Genie is sorry</h1></div>
+       <div id="mainBox" class="mainBox">
+           <div>
+               <p>Unfortunately, since you selected <strong>"I don't agree" </strong> the XWish Genie would be unable to become <strong>your genie!</strong></p>
+           </div>
+       </div>
+
+       <div class="footer">
+         <div class="btn">
+           <a id="auth" href="javascript:makePageVisible('summaryEula');">
+           <span class="leftBtn">Back</span></a>
+         </div>
+       </div>
+    </div>
+ <div id="otherLogin" class="hide" >
+       <div class="headerBox"><a id="auth" href="javascript:makePageVisible('summaryEula');"><img src="img_over_the_net/logo_bg.png" class="logo" /></a><h1>Other Logins</h1></div>
+       <div class="mainBox" class="mainBox">
+           <div>
+               <p>Currently only Facebook login is supported. Other types of logins are coming soon!</p>
+           </div>
+       </div>
+
+       <div class="footer">
+         <div class="btn">
+           <a id="auth" href="javascript:makePageVisible('loginPage');">
+           <span class="leftBtn">Back</span></a>
+         </div>
+       </div>
+    </div>
+
+ <div id="eula" class="hide">
+    <div id="EulaHeaderBox" class="headerBox"><a id="auth" href="javascript:makePageVisible('summaryEula');"><img src="img_over_the_net/logo_bg.png" class="xwishlogo" /></a><h1>End User License Agreement</h1></div>
+    <div id="EulaMainBox" class="mainBox">
+        <div id="EulaContent">
+            <div class="backBtn"><a id="_auth" href="javascript:makePageVisible('summaryEula');"><span class="">Back</span></a></div>
+                <p>    PLEASE SCROLL TO THE BOTTOM OF THESE TERMS OF USE ("TERMS") AND READ THEM CAREFULLY.  THESE TERMS CONSTITUTE A BINDING AGREEMENT BETWEEN YOU AND XWISH, INC.  ("COMPANY") FOR THE USE OF THIS APPLICATION (THE "APPLICATION"), ANY COMPANY WEB OF MOBILE SITES WHICH LINK TO THESE TERMS (THE "SITES") AND THE XWISH SERVICE WHICH IS PROVIDED THROUGH THE APPLICATION AND THE SITES.  BY CLICKING THE "I ACCEPT" BUTTON OR USING THE APPLICATION OR THE SERVICE, YOU AGREE TO BE LEGALLY BOUND BY ALL TERMS AND CONDITIONS CONTAINED IN THESE TERMS.</p>
+                <p><strong>BY DOWNLOADING THE APPLICATION OR USING THE SITES, YOU CONSENT TO THE COLLECTION AND USE OF LOCATION-BASED DATA AS DESCRIBED IN SECTION 6 BELOW AND IN THE XWISH <a  href="javascript:makePageVisible('privacyPolicy');">PRIVACY POLICY.</a>  YOU MAY OPT OUT OF FURTHER COLLECTION AT ANY TIME BY UNINSTALLING THE APPLICATION.  YOU MAY TEMPORARILY PREVENT THE ACCESSING OF LOCATION INFORMATION BY LOGGING OUT OF THE APPLICATION OR BY USING THE PRIVACY SETTINGS IN THE APPLICATION.</p></strong>
+
+                <p>2.  Privacy Policy.  Please refer to our <a href="javascript:makePageVisible('privacyPolicy');">Privacy Policy</a> for information on how Company collects, uses and discloses personally identifiable information.</p>
+                <p>3.  Ownership.  The Application, the Sites and the Service contains the valuable proprietary content of Company and its licensors and is protected by copyright and other intellectual property laws and treaties.  You agree not to use the Application except in its intended manner in accordance with the terms of this EULA.</p>
+                <p>4.  License.  Subject to the terms, conditions and limitations set forth in this EULA, Company grants you a non-exclusive non-transferable license to access and use the Application and the Service on any mobile device that you own or control and to access and use the Sites, solely for your personal, noncommercial use.  The terms of the license will also govern any upgrades provided by Company that replace and/or supplement the original Application, unless such upgrade is accompanied by a separate license in which case the terms of that license will govern.  This license is revocable at any time.</p>
+                <p>5.  Limitations.  You agree not to do, or authorize or permit any third party to do, any of the following in connection with the Application, the Sites and the Service: (i) distribute or make the Application or Service available over a network where it could be used by multiple devices at the same time; (ii) rent, lease, lend, sell, redistribute or sublicense the Application; (iii) copy, decompile, reverse engineer, disassemble, attempt to derive the source code of, modify, or create derivative works of the  Application, any updates, or any part thereof (except as and only to the extent any foregoing restrictions are prohibited by applicable law); (iv) modify, alter or create any derivative works of the Application; (v) use any data mining, robots or similar data gathering or extraction methods; (vi) remove, alter or obscure any copyright, trademark or other proprietary rights notice; or (vii) use the Application, the Sites or the Service other than for their intended purpose.  If you violate any of the foregoing restrictions, your use of the Application will be unlicensed and will infringe the copyright and other rights of Company, which may subject you to prosecution and damages. Company reserves all rights not expressly granted to you herein.</p>
+                <p>6.  Consent to Use of Data and Mobile Communications.  You agree that Company may collect and use location data, technical data, and related information in connection with your use of the Application and the Service, including but not limited to location information, device type, the unique device identifier ("UDID") for your mobile device and other technical information about your device, system and application software, and peripherals, that is gathered periodically to facilitate the features and functionality of the Application  and the Service and of software updates, product support and other services.  We use your location information to provide the Service.  We also may use and store your location information in order to analyze, personalize and improve the Service.  Your location will not be shared with third parties without your consent, except in the limited ways set forth in our <a  href="javascript:makePageVisible('privacyPolicy');">privacy policy.</a>  You also consent to our communicating with you about the Application or in connection with the features, functions and activities contained therein by SMS, text message, email or other electronic means.  Your carrier's normal, messaging, data and other rates and fees will apply to these communications.  You consent to the transfer of your user data, personal information, location information, or any other information we collect about you to our servers in the United States for the purpose of delivering the Sites and Service to you.</p>
+                <p>7.  Third Party Sites and Services; Third Party Materials.  The Application may provide links to third party websites, applications, mobile services or other third party services ("Third Party Services") and may also display, link to or otherwise make available third party content, data, information, events, applications or materials ("Third Party Materials").  Company does not endorse or control and makes no representations or warranties of any kind regarding any Third Party Services or Third Party Materials, including regarding the content, accuracy, quality, nature, appropriateness, decency, functionality, performance, reliability, completeness, timeliness, validity, safety, legality, or any other aspect thereof.  If you access or use any third party web site, you should be aware that Company's terms and policies no longer govern.  You should review the applicable terms and policies, including privacy and data gathering practices, of any third party web site to which you navigate from the Application.</p>
+                <p>8.  Third Party Interactions.  Your use of the Application and the Service and your contact, interaction, or dealings with any third parties arising out of such use is solely at your own risk.  You acknowledge and agree that Company is not responsible or liable in any manner for any loss, damage or harm of any sort incurred as the result of the Application or the Service, including from any contact with third parties who may locate you through your use of the Application or the Service.</p>
+                <p>9.  User Content and Conduct.  Users are solely responsible for all messages and content ("User Content") they post or transmit using the Application or the Service, or that are posted or transmitted using their account, as well as for their conduct and the conduct of anyone using their account.  You agree that Company is not responsible for the conduct or content of other users that you may encounter as a result of using the Application or the Service.  You agree not to post or transmit any of the following: (a) User Content that is defamatory, obscene, pornographic, harassing, threatening, invasive of privacy or publicity rights, abusive, inflammatory, fraudulent, deceptive or otherwise inappropriate; (b) User Content that may infringe any patent, trademark, trade secret, copyright or other intellectual property or other right of any third party or violate any local, state, national or international law; (c)viruses, corrupted data or other harmful, disruptive or destructive files; (d) code, script, or other software designed to automate any functionality on the Sites or Service; (e) unsolicited commercial messages (spam); or (f) User Content that restricts or inhibits any other person from using or enjoying the Application, the Sites or the Service or which may expose Company or its users to any harm or liability of any type.  Enforcement of these user content or conduct rules set forth in these Terms is solely at Company's discretion, and failure to enforce such rules in some instances does not constitute a waiver of our right to enforce such rules in other instances.  In addition, these rules do not create any private right of action on the part of any third party or any reasonable expectation that the Application, the Sites or the Service will not contain any content that is prohibited by such rules.   Although Company has no obligation to screen, edit or monitor any User Content, Company reserves the right to screen, monitor, edit or remove any User Content at any time and for any reason without notice.  You grant Company the royalty-free, fully sublicensable right to use, reproduce, modify, adapt, publish, distribute, perform and display any User Content you post, along with the name that you submit in connection with such User Content, in order to enable us to provide the Service.  You represent and warrant that any User Content you post is accurate and not misleading and that the use and posting of the User Content does not infringe upon or violate any third party rights.</p>
+                <p>10. Termination or Modification.  Company reserves the right to change, suspend, remove, discontinue or disable your access to the Application , the Sites and the Service at any time without notice, without any liability to Company.  In the event of  termination for any reason: (a) the license granted to you in these Terms will terminate; (b) you must immediately cease all use of the Application, the Sites and the Service; and (c) sections 1, 2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, and 15, of these Terms will survive any such termination.  Any use of the Application after termination is unlicensed and is in violation of the copyright and other rights of Company.</p>
+                <p>11. DISCLAIMERS.  YOU ACKNOWLEDGE THAT THE APPLICATION, THE SITES AND THE SERVICE ARE PROVIDED "AS IS" AND "AS AVAILABLE," WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND.  THEREFORE, THE USE OF THE APPLICATION, THE SITES AND THE SERVICE IS AT YOUR OWN RISK, INCLUDING ALL RISKS AS TO QUALITY, PERFORMANCE, SAFETY, SECURITY, AND ACCURACY.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, COMPANY HEREBY DISCLAIMS ALL REPRESENTATIONS, WARRANTIES AND CONDITIONS WITH RESPECT TO THE APPLICATION, THE SITES AND THE SERVICE, EITHER EXPRESS, IMPLIED OR ARISING BY LAW, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, COMPLETENESS, QUIET ENJOYMENT, AND NON-INFRINGEMENT OF THIRD PARTY RIGHTS.  COMPANY DOES NOT WARRANT THAT THE FUNCTIONS CONTAINED IN THE APPLICATION WILL BE ACCURATE OR MEET YOUR REQUIREMENTS, THAT THE OPERATION OF THE APPLICATION WILL BE UNINTERRUPTED OR ERROR-FREE, OR THAT DEFECTS IN THE APPLICATION WILL BE CORRECTED.</p>
+                <p>12. LIMITATION OF LIABILITY.  TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL COMPANY BE LIABLE ANY DIRECT, INCIDENTAL, SPECIAL, INDIRECT, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES WHATSOEVER, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION OR ANY OTHER COMMERCIAL DAMAGES OR LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE APPLICATION, THE SITES OR THE SERVICE, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT, TORT OR OTHERWISE) AND EVEN IF COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.   IN NO EVENT SHALL COMPANY’S TOTAL LIABILITY, WHETHER IN CONTRACT, WARRANTY, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY, STRICT LIABILITY OR OTHER THEORY, ARISING OUT OF OR RELATING TO THE USE OF OR INABILITY TO USE THE APPLICATION, THE SITES OR THE SERVICE EXCEED ONE DOLLAR.  THE FOREGOING LIMITATIONS WILL APPLY EVEN IF THE ABOVE STATED REMEDY FAILS OF ITS ESSENTIAL PURPOSE.</p>
+                <p>13. Export Limitations.  You may not use or otherwise export or re-export the Application except as authorized by United States law and the laws of the jurisdiction in which the Licensed Application was obtained. In particular, but without limitation, the Application may not be exported or re-exported (a) into any U.S. embargoed countries or (b) to anyone on the U.S. Treasury Department's list of Specially Designated Nationals or the U.S. Department of Commerce Denied Person’s List or Entity List. By using the Application, you represent and warrant that you are not located in any such country or on any such list. You also agree that you will not use these products for any purposes prohibited by United States law, including, without limitation, the development, design, manufacture or production of nuclear, missiles, or chemical or biological weapons.</p>
+                <p>14. US Government Rights.  The Application and related documentation are "Commercial Items", as that term is defined at 48 C.F.R. §2.101, consisting of "Commercial Computer Software" and "Commercial Computer Software Documentation", as such terms are used in 48 C.F.R. §12.212 or 48 C.F.R. §227.7202, as applicable. Consistent with 48 C.F.R. §12.212 or 48 C.F.R. §227.7202-1 through 227.7202-4, as applicable, the Commercial Computer Software and Commercial Computer Software Documentation are being licensed to U.S. Government end users (a) only as Commercial Items and (b) with only those rights as are granted to all other end users pursuant to the terms and conditions herein. Unpublished-rights reserved under the copyright laws of the United States.</p>
+                <p>15. Governing Law; Venue.  The laws of the State of Washington, excluding its conflicts of law rules, govern your use of the Application. Your use of the Application may also be subject to other local, state, national, or international laws. You agree that any action at law or in equity arising out of or relating to the Application, the Service or this agreement shall be filed only in the state and federal courts located in King County, Washington, and you irrevocably and unconditionally consent and submit to the exclusive jurisdiction of such courts over any suit, action or proceeding arising out of the Application.</p>
+        </div>
+    </div>
+     <div class="footer">
+      <div class="btn">
+        <a id="_auth" href="javascript:makePageVisible('summaryEula');">
+        <span class="leftBtn">Back</span></a>
+      </div>
+    </div>
+</div>
+
+<div id="privacyPolicy" class="hide">
+    <div id="ppHeaderBox" class="headerBox"><a id="_auth" href="javascript:makePageVisible('summaryEula');"><img src="img_over_the_net/logo_bg.png" class="logo" /></a><h1>Privacy Policy</h1></div>
+    <div id="ppMainBox" class="mainBox">
+        <div><h2>Last Revised: Feb. 20, 2012</h2><div class="backBtn"><a id="_auth" href="javascript:makePageVisible('summaryEula');"><span class="">Back</span></a></div></div><br/>
+        <div id="ppContent">
+            <p>This Privacy Policy ("Policy") explains how personal information about you is collected, used and disclosed by XWish, Inc. ("Company") when you use the XWish mobile application and service and any related any websites or mobile sites of Company that link to this Policy (collectively the "Application").</p>
+            <p>We reserve the right to change the provisions of this Policy at any time.  We will alert you that changes have been made by updating the "Last Revised" date at the top of the Policy.  We encourage you to review this Policy from time to time to make sure that you understand how any personal information you provide will be used and shared.</p>
+            <p><h4>What Is Personal Information?</h4>As used herein, the term "personal information" means information that specifically identifies an individual (such as a name, address, telephone number, mobile number, e-mail address or credit card number) or information about an individual that is directly linked to personally identifiable information.  Personal information does not include "aggregate" information, which is data we collect about the use of the Application or about a group or category of services or users, from which individual identities or other personal information has been removed.  This Policy in no way restricts or limits our collection, use and disclosure of aggregate information.</p>
+            <p><h4>What Information Do We Collect?</h4><u>Active Collection:</u>  We collect information from you in various ways when you use the Application.  For example, we collect information you voluntarily provide to us, such as if you create an account, send us an email, fill out a form, create personalized XWishes and places, request information, or provide it in connection with posting text or messages or otherwise using the Application.  Such information may include personal information, such as your name, email address, and other contact information you choose to provide.  We may also collection demographic information if you choose to provide such information.</p>
+            <p><u>Passive Collection:</u>  When you use the Application, some information is also automatically collected, such as your Internet Protocol (IP) address, Mobile Operator network, browser type, phone model, OS version, battery levels, unique device identified ("UDID"), and other system level information. The Application also automatically collects your location information. We treat the foregoing information as personal information if we combine it with or link it to any of the identifying information mentioned above.  Otherwise, it is used in the aggregate only.</p>
+            <p>This Application is installed and logged into using your Facebook account.  When you install the Application, you authorize the Company to access, use and store certain information (e.g. your name, profile, friends, etc.), and content from your Facebook account as described in the signup process on Facebook.</p>
+            <p>We may automatically collect certain information through the use of cookies, web beacons, or other information collection technologies that enable us to collect certain information and monitor user activity.  Among other things, cookies help us improve the Application and your experience.  If we link cookies to any personally identifying information, we will treat this information as personal information.  If you wish to block, erase, or be warned of cookies, please refer to your browser manufacturer to learn about these functions.  However, if you choose to remove or reject cookies, this could affect certain features or services of the Application.  Web beacons are small, invisible graphic images that may be used on our Sites or in emails to collect certain information and monitor user activity, such as to count visits, understand usage and campaign effectiveness and to tell if an email has been opened and acted upon.</p>
+            <p><h3>How Do We Use the Location and Personal Information We Collect?</h3>We use the location information we collect in order to provide the Application, including to provide the XWISH service and the other services, products or information you request as well as to analyze, personalize and improve the Application.   We use the personal information we collect:</p>
+            <p>
+                <ul>
+                    <li>to operate the Application and provide the XWISH service and the other services, products or information you or your friends request;</li>
+                    <li>to request feedback and to otherwise contact you about your use of the Application;</li>
+                    <li>to respond to your emails, questions, comments, requests and complaints, send administrative messages and otherwise provide customer service and;</li>
+                    <li>for any other purpose for which the information was collected.</li>
+                </ul>
+            </p>
+            <p>We may store and process personal information in the country from which it was collected and in the United States.</p>
+            <p>
+                <h4>What Location and Personal Information Do We Share With Third Parties?</h4>
+                The Application is designed not to share your personal or location information with third parties, except as described in this Policy.  We may share location or personal information as follows:
+                <ul>
+                    <li>with vendors, consultants and other service providers (collectively "Service Providers") who are engaged by us and need access to such information to carry out their work.</li>
+                    <li>when you give us your consent to do so, including if we notify you in the Application that the information you provide will be shared in a particular manner and you provide such information; </li>
+                    <li>in an aggregated or anonymized form that does not directly identify you;</li>
+                    <li>when we believe in good faith that we are lawfully authorized or required to do so or that doing so is reasonably necessary or appropriate to comply with the law or legal processes or respond to lawful requests or legal authorities, including responding to lawful subpoenas, warrants or court orders;</li>
+                    <li>when we believe in good faith that we are lawfully authorized or required to do so or that doing so is reasonably necessary or appropriate to protect the rights, property or safety of Company, our users, our employees or others, including without limitation to protect Company and our users from fraudulent, abusive, inappropriate or unlawful use of the Application;</li>
+                    <li>to enforce or apply this Policy, our <a href="javascript:makePageVisible('eula');"> Terms of Use </a> or our other policies or agreements; and</li>
+                    <li>in connection with, or during negotiations of, any merger, sale of company assets, financing or acquisition, or in any other situation where personal information may be disclosed or transferred as one of our business assets.</li>
+                </ul>
+            </p>
+            <p>You understand that when you use the Application, information you post in any public portions of the Application Sites, as well as any information you share with individuals through the Application or through social network sites, will be available to other users and in some cases may be publicly available. </p>
+            <p>We are not responsible for the actions of Service Providers or other third parties, nor are we responsible for any additional information you provide directly to any third parties, and we encourage you to become familiar with their privacy practices before disclosing information directly to any such parties.  Nothing herein restricts the sharing of aggregated or anonymized information, which may be shared with third parties without your consent.</p>
+            <p><h3>Links to Other Websites</h3>The Application may contain links to third party websites.  Any personal information you provide to a third party website is provided directly to that third party and is subject to that third party's privacy policy.  This Policy does not apply to third party websites, and we are not responsible for the content or privacy and security practices and policies of those websites.  We encourage you to learn about third parties' privacy and security practices and policies before providing them with personal information.</p>
+
+            <p><h3>What Choices Do You Have Regarding the Collection and Use of Your Information?</h3>You may opt out of further collection of location information at any time by uninstalling the Application.  You may also temporarily prevent the accessing of location information by logging out of the Application or by using the privacy settings in the Application.</p>
+            <p><h3>Contact Us</h3>If you have any questions about this Policy, please contact us at:</p>
+            <p><strong>XWish, Inc.</strong></p>
+            <p><strong><a href="mailto:info@example.com">info@example.com</a></strong></p>
+        </div>
+    </div>
+    <div class="footer">
+      <div class="btn">
+        <a id="_auth" href="javascript:makePageVisible('summaryEula');">
+        <span class="leftBtn">Back</span></a>
+      </div>
+    </div>
+</div>
+
+<div id="PhoneOnly" class="hide">
+    <div class="headerBox"><img src="img_over_the_net/logo_bg.png" class="logo"/><h1>Android Browser Required</h1></div>
+    <div class="mainBox">
+        <div id="content">
+            <p>This page is designed to work only within an Android browser, Please try again from your Android device browser!</p>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

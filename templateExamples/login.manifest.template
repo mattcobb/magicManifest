@@ -1,0 +1,17 @@
+CACHE MANIFEST
+# {{{WARNING}}}
+# manifest version 1.0.0.55
+# Files to cache
+
+CACHE:
+login.html
+{{{SOURCES}}}
+extern/jquery.min.js
+{{{STYLES}}}
+sencha/sencha-touch.js
+extern/jquery.min.js
+{{{CREATIVES}}}
+NETWORK:
+*
+http://*
+https://*

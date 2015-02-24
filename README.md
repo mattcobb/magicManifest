@@ -1,4 +1,4 @@
-Automatically creating an HTML5 Manifest
+Automatically create an HTML5 Manifest
 
 Set manifestTemplate to template manifest file
 Set pageTemplate to the template html page that references the manifest
