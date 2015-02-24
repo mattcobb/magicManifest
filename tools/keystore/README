@@ -1,0 +1,8 @@
+
+Production keystore:  prod.keystore
+Debug keystore: debug.keystore
+
+Inorder to be have seamless debugging ability between dev and prod, eclipse and ant, they both have the same RSA key pair.  This is the command that was used to 
+produce the debug version from the production version:
+
+keytool -importkeystore -v -srckeystore xwish.keystore -destkeystore debug.keystore -srcstorepass android -deststorepass android -srcalias xwish -destalias androiddebugkey -srckeypass android -destkeypass android
