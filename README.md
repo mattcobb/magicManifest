@@ -9,7 +9,7 @@ targetDir is location where your manifest and the web page using your manifest w
 The targetDir is specified relative to this directory
 
 Modify the magicManifestsConfig.js to fit you
-
+```json
 exports.magicManifestsConfig =
 [
     { // your.manifest of your_page.html
@@ -93,4 +93,5 @@ exports.magicManifestsConfig =
         htmlStyleLinkDecorateTemplate : '<link href="{{{FILE}}}" rel="stylesheet" type="text/css"/>',
         htmlScriptDecorateTemplate : '<script src="{{{FILE}}}" type="text/javascript"></script>'
     }
-];
+]
+```
