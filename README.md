@@ -4,8 +4,6 @@ Set manifestTemplate to the name of the template manifest file
 
 Set pageTemplate to the template html page that references the manifest
 
-Templates use 
-
 targetDir is location where your manifest and the web page using your manifest will be served to end users.
 The targetDir is specified relative to this directory
 
